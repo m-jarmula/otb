@@ -1,6 +1,6 @@
-class JobManager
-  ContractNotImplementedError = Class.new(NotImplementedError)
+require_relative '../errors/contract_not_implemented'
 
+class JobManager
   def initialize(string)
     string.scan(/(\w+) => ?(\w?)/i).each(&method(:each_job))
   end
@@ -8,6 +8,6 @@ class JobManager
   private
 
   def each_job(job_data)
-    raise ContractNotImplementedError, 'Class should implement contract each_job'
+    raise ::ContractNotImplementedError.new('each_job')
   end
 end
