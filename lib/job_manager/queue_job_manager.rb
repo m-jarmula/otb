@@ -1,7 +1,6 @@
 require_relative 'job_manager'
 require_relative '../job'
-require_relative '../errors/self_dependent'
-require_relative '../errors/circural_dependency'
+require_relative '../validator'
 require_relative '../data_manager'
 require 'forwardable'
 
@@ -33,15 +32,8 @@ class QueueJobManager < JobManager
   end
 
   def validate(job)
-    raise ::SelfDependentError if job.self_dependent?
-    dependency = find_by_id(job.dependency)
-    raise ::CircuralDependency if circural_dependency?(job, dependency)
-  end
-
-  def circural_dependency?(job, job_dependency_object)
-    next_dependency = find_by_id(job_dependency_object.dependency)
-    return true if job.id == job_dependency_object.dependency
-    return false if next_dependency.nil?
-    circural_dependency?(job, next_dependency)
+    ::Validator.validate(job: job,
+                         dependency: find_by_id(job.dependency),
+                         data_manager: @data_manager)
   end
 end
