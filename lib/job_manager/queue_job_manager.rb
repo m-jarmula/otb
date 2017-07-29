@@ -6,8 +6,7 @@ require 'forwardable'
 
 class QueueJobManager < JobManager
   extend ::Forwardable
-  def_delegators :@data_manager, :get_index, :find_by_id, :find_by_dependency, :insert_before,
-                 :append, :jobs
+  def_delegators :@data_manager, :find_by_dependency, :insert_before, :append, :jobs
 
   private
 
