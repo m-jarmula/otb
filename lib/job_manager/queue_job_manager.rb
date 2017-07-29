@@ -2,15 +2,18 @@ require_relative 'job_manager'
 require_relative '../job'
 require_relative '../errors/self_dependent'
 require_relative '../errors/circural_dependency'
+require_relative '../data_manager'
+require 'forwardable'
 
 class QueueJobManager < JobManager
-  SelfDependentError = Class.new(StandardError)
-  attr_reader :jobs
+  extend ::Forwardable
+  def_delegators :@data_manager, :get_index, :find_by_id, :find_by_dependency, :insert_before,
+                 :append, :jobs
 
   private
 
   def initialize(*params)
-    @jobs = []
+    @data_manager = DataManager.new
     super
   end
 
@@ -35,31 +38,10 @@ class QueueJobManager < JobManager
     raise ::CircuralDependency if circural_dependency?(job, dependency)
   end
 
-  def insert_before(before_node, job)
-    depended_job_index = get_index(before_node)
-    @jobs.insert(depended_job_index, job)
-  end
-
-  def append(job)
-    @jobs << job
-  end
-
   def circural_dependency?(job, job_dependency_object)
     next_dependency = find_by_id(job_dependency_object.dependency)
     return true if job.id == job_dependency_object.dependency
     return false if next_dependency.nil?
     circural_dependency?(job, next_dependency)
-  end
-
-  def get_index(job)
-    @jobs.index(job)
-  end
-
-  def find_by_id(id)
-    @jobs.find { |job| job.id == id }
-  end
-
-  def find_by_dependency(id)
-    @jobs.find { |job| job.dependency == id }
   end
 end
