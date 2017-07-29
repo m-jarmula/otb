@@ -32,8 +32,6 @@ class QueueJobManager < JobManager
   end
 
   def validate(job)
-    ::Validator.validate(job: job,
-                         dependency: find_by_id(job.dependency),
-                         data_manager: @data_manager)
+    ::Validator.validate(job: job, data_manager: @data_manager)
   end
 end
