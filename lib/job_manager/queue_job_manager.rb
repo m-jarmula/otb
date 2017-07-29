@@ -20,16 +20,28 @@ class QueueJobManager < JobManager
   end
 
   def add(job)
-    raise ::SelfDependentError if job.self_dependent?
-    depended_job_index = get_index(find_by_dependency(job.id))
-    dependency = find_by_id(job.dependency)
-    dd = circural_dependency?(job, dependency) if dependency
-    if(depended_job_index)
-      p dd if dependency
-      @jobs.insert(depended_job_index, job)
+    validate(job)
+    depended_job = find_by_dependency(job.id)
+    if depended_job
+      insert_before(depended_job, job)
     else
-      @jobs << job
+      append(job) unless depended_job
     end
+  end
+
+  def validate(job)
+    raise ::SelfDependentError if job.self_dependent?
+    dependency = find_by_id(job.dependency)
+    raise ::CircuralDependency if circural_dependency?(job, dependency)
+  end
+
+  def insert_before(before_node, job)
+    depended_job_index = get_index(before_node)
+    @jobs.insert(depended_job_index, job)
+  end
+
+  def append(job)
+    @jobs << job
   end
 
   def circural_dependency?(job, job_dependency_object)
