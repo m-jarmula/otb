@@ -16,7 +16,7 @@ class Validator
 
   def self.validate_circural_dependency
     return unless @dependency
-    raise ::CircuralDependency if circural_dependency?(@job, @dependency)
+    raise ::CircuralDependencyError if circural_dependency?(@job, @dependency)
   end
 
   def self.circural_dependency?(job, job_dependency_object)
