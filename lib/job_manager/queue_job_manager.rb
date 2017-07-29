@@ -8,6 +8,10 @@ class QueueJobManager < JobManager
   extend ::Forwardable
   def_delegators :@data_manager, :find_by_dependency, :insert_before, :append, :jobs
 
+  def ids
+    jobs.map(&:id)
+  end
+
   private
 
   def initialize(*params)
