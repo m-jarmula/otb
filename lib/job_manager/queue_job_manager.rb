@@ -5,8 +5,15 @@ require_relative '../data_manager'
 require 'forwardable'
 
 class QueueJobManager < JobManager
-  extend ::Forwardable
+  extend Forwardable
   def_delegators :@data_manager, :find_by_dependency, :insert_before, :append, :jobs
+  def_delegators :@validator, :validate!
+
+  def initialize(*params)
+    @data_manager = DataManager.new
+    @validator = Validator.new
+    super
+  end
 
   def ids
     jobs.map(&:id)
@@ -14,27 +21,18 @@ class QueueJobManager < JobManager
 
   private
 
-  def initialize(*params)
-    @data_manager = DataManager.new
-    super
-  end
-
   def each_job(job_data)
     id, dependency = job_data.reject(&:empty?)
     add(Job.new(id: id, dependency: dependency))
   end
 
   def add(job)
-    validate(job)
+    validate!(job: job, data_manager: @data_manager)
     depended_job = find_by_dependency(job.id)
     if depended_job
       insert_before(depended_job, job)
     else
       append(job) unless depended_job
     end
-  end
-
-  def validate(job)
-    ::Validator.validate(job: job, data_manager: @data_manager)
   end
 end
