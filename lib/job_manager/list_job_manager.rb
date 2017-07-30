@@ -6,12 +6,12 @@ require 'forwardable'
 
 class ListJobManager < JobManager
   extend Forwardable
-  def_delegator :@validator, :validate!
+  def_delegator :Validator, :validate!
   def_delegator :@data_manager, :jobs
 
   def initialize(*params)
     @data_manager = DataManager.new
-    @validator = Validator.new
+    # @validator = Validator.new
     super
   end
 

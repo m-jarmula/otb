@@ -2,12 +2,18 @@ require_relative 'errors/self_dependent'
 require_relative 'errors/circural_dependency'
 
 class Validator
-  def validate!(job:, data_manager:)
+  def initialize(job, data_manager)
     @job = job
     @dependency = data_manager.find_by_id(job.dependency)
     @data_manager = data_manager
-    validate_self_dependency!
-    validate_circural_dependency!
+  end
+
+  def self.validate!(job:, data_manager:)
+    validator = new(job, data_manager)
+    validator.instance_eval do
+      validate_self_dependency!
+      validate_circural_dependency!
+    end
   end
 
   private
