@@ -11,7 +11,6 @@ class ListJobManager < JobManager
 
   def initialize(*params)
     @data_manager = DataManager.new
-    # @validator = Validator.new
     super
   end
 
