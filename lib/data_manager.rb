@@ -25,4 +25,13 @@ class DataManager
   def append(job)
     @jobs << job
   end
+
+  def add(job)
+    depended_job = find_by_dependency(job.id)
+    if depended_job
+      insert_before(depended_job, job)
+    else
+      append(job)
+    end
+  end
 end
