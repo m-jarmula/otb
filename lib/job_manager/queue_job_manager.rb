@@ -32,7 +32,7 @@ class QueueJobManager < JobManager
     if depended_job
       insert_before(depended_job, job)
     else
-      append(job) unless depended_job
+      append(job)
     end
   end
 end
