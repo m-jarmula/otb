@@ -10,10 +10,8 @@ class Validator
 
   def self.validate!(job:, data_manager:)
     validator = new(job, data_manager)
-    validator.instance_eval do
-      validate_self_dependency!
-      validate_circural_dependency!
-    end
+    validator.send(:validate_self_dependency!)
+    validator.send(:validate_circural_dependency!)
   end
 
   private
