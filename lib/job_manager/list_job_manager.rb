@@ -4,7 +4,7 @@ require_relative '../validator'
 require_relative '../data_manager'
 require 'forwardable'
 
-class QueueJobManager < JobManager
+class ListJobManager < JobManager
   extend Forwardable
   def_delegator :@validator, :validate!
   def_delegator :@data_manager, :jobs

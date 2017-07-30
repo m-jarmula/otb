@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe 'QueueJobManager' do
+describe 'ListJobManager' do
 
   describe '#initialize' do
     it 'adds valid structure' do
-      queue_job_manager = QueueJobManager.new('a =>')
+      queue_job_manager = ListJobManager.new('a =>')
       expect(queue_job_manager.ids).to include('a')
     end
   end
@@ -12,14 +12,14 @@ describe 'QueueJobManager' do
   describe '#ids' do
     context 'with three params, no dependency' do
       it 'returns valid job sequence no queue modification' do
-        queue_job_manager = QueueJobManager.new("a =>\nb =>\nc =>")
+        queue_job_manager = ListJobManager.new("a =>\nb =>\nc =>")
         expect(queue_job_manager.ids.size).to eq(3)
         expect(queue_job_manager.ids).to include('a', 'b', 'c')
       end
     end
 
     context 'with three params, one dependency' do
-      let(:queue_job_manager) { QueueJobManager.new("a =>\nb =>c\nc =>") }
+      let(:queue_job_manager) { ListJobManager.new("a =>\nb =>c\nc =>") }
 
       it 'returns valid job sequence' do
         expect(queue_job_manager.ids.size).to eq(3)
@@ -32,7 +32,7 @@ describe 'QueueJobManager' do
     end
 
     context 'with 6 params, multiple dependencies' do
-      let(:queue_job_manager) { QueueJobManager.new("a =>\nb => c\nc => f\nd => a\ne => b\nf =>") }
+      let(:queue_job_manager) { ListJobManager.new("a =>\nb => c\nc => f\nd => a\ne => b\nf =>") }
 
       it 'returns valid job sequence' do
         expect(queue_job_manager.ids.size).to eq(6)
@@ -49,14 +49,14 @@ describe 'QueueJobManager' do
 
     context 'with self dependency' do
       it 'raises SelfDependentError' do
-        expect { QueueJobManager.new("a =>\nb =>\nc => c") }.to raise_error SelfDependentError
+        expect { ListJobManager.new("a =>\nb =>\nc => c") }.to raise_error SelfDependentError
       end
     end
 
     context 'with circural dependency' do
       it 'raises CircuralDependencyError' do
         expect do
-          QueueJobManager.new("a =>\nb => c\nc => f\nd => a\ne =>\nf => b")
+          ListJobManager.new("a =>\nb => c\nc => f\nd => a\ne =>\nf => b")
         end.to raise_error CircuralDependencyError
       end
     end
