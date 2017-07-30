@@ -7,7 +7,7 @@ require 'forwardable'
 class QueueJobManager < JobManager
   extend Forwardable
   def_delegators :@data_manager, :find_by_dependency, :insert_before, :append, :jobs
-  def_delegators :@validator, :validate!
+  def_delegator :@validator, :validate!
 
   def initialize(*params)
     @data_manager = DataManager.new
